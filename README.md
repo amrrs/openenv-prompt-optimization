@@ -347,7 +347,6 @@ instead of a public Space.
 prompt-optimization/
 ├── README.md                          # this tutorial
 ├── prompt_optimization_openenv.ipynb  # notebook version, executed end to end
-├── build_notebook.py                  # regenerates the notebook from source cells
 ├── access_request_env/                # the OpenEnv environment package
 ├── agent.py                           # Token Factory policy: run_episode / run_batch
 ├── optimize.py                        # reflective prompt optimizer

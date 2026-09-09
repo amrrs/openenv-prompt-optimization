@@ -188,7 +188,7 @@ def test_escalation_routing():
 
 def test_invalid_tool_call_and_overrun_penalties():
     env = AccessRequestEnvironment()
-    ticket = _reset(env, "terminated")
+    _reset(env, "terminated")
     bad = env.step(CallToolAction(tool_name="get_employee", arguments={"wrong_arg": "x"}))
     assert bad.error is not None and bad.metadata.get("invalid_call") is True
     for _ in range(FREE_TOOL_CALLS + 1):  # push past the free budget
