@@ -73,8 +73,8 @@
 
   <rect x="924" y="358" width="282" height="80" rx="8" fill="#ffffff" stroke="#fdba74"/>
   <text x="1065" y="382" text-anchor="middle" font-weight="700" fill="#111827">Reward on the terminal step</text>
-  <text x="936" y="406" fill="#374151">+1 correct · −1 unauthorized grant · +0.2 needless</text>
-  <text x="936" y="426" fill="#374151">escalation · penalties for extra / invalid calls</text>
+  <text x="936" y="406" fill="#374151" font-size="13">+1 correct · −1 unauthorized grant · +0.2 needless</text>
+  <text x="936" y="426" fill="#374151" font-size="13">escalation · penalties for extra / invalid calls</text>
 
   <!-- ===== the loop, numbered. Labels live inside the 130px gaps. ===== -->
   <!-- 1: agent <-> policy model -->
