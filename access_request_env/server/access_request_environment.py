@@ -258,9 +258,7 @@ class AccessRequestEnvironment(MCPEnvironment):
             reason_code must match the policy rule that applies. The note is
             sent to the requester and must explain the decision.
             """
-            return env._record_decision(
-                {"decision": "deny", "reason_code": reason_code, "note": note}
-            )
+            return env._record_decision({"decision": "deny", "reason_code": reason_code, "note": note})
 
         @mcp.tool
         def escalate(to: EscalationTarget, reason_code: ReasonCode, note: str) -> dict:
@@ -270,9 +268,7 @@ class AccessRequestEnvironment(MCPEnvironment):
             (segregation of duties) or "system_owner" (admin access or policy
             exception). The note must give the reviewer everything they need.
             """
-            return env._record_decision(
-                {"decision": "escalate", "to": to, "reason_code": reason_code, "note": note}
-            )
+            return env._record_decision({"decision": "escalate", "to": to, "reason_code": reason_code, "note": note})
 
         super().__init__(mcp)
         self.rubric = judge if judge is not None else build_judge_from_env()
@@ -323,9 +319,7 @@ class AccessRequestEnvironment(MCPEnvironment):
         obs = super().step(action, timeout_s=timeout_s, **kwargs)
         return self._post_step(action, obs, async_mode=False)
 
-    async def step_async(
-        self, action: Action, timeout_s: Optional[float] = None, **kwargs: Any
-    ) -> Observation:
+    async def step_async(self, action: Action, timeout_s: Optional[float] = None, **kwargs: Any) -> Observation:
         if self._done:
             return self._episode_over_observation(action)
         self._state.step_count += 1
@@ -337,8 +331,7 @@ class AccessRequestEnvironment(MCPEnvironment):
             done=False,
             reward=0.0,
             metadata={
-                "error": f"Unsupported action type {type(action).__name__}. "
-                "Use CallToolAction or ListToolsAction."
+                "error": f"Unsupported action type {type(action).__name__}. Use CallToolAction or ListToolsAction."
             },
         )
 
@@ -487,7 +480,9 @@ class AccessRequestEnvironment(MCPEnvironment):
             if kind == "grant":
                 base, outcome = -1.0, "unauthorized_grant"
             elif kind == "deny":
-                base, outcome = (-0.2, "denied_should_grant") if truth.decision == "grant" else (0.0, "denied_should_escalate")
+                base, outcome = (
+                    (-0.2, "denied_should_grant") if truth.decision == "grant" else (0.0, "denied_should_escalate")
+                )
             else:
                 base, outcome = 0.2, "unnecessary_escalation"
 
@@ -525,7 +520,9 @@ if __name__ == "__main__":
     obs = env.reset(seed=1003)  # archetype: terminated (1003 % 13 == 2)
     print("ticket:", json.dumps(obs.metadata["ticket"], indent=2))
     print("tools:", [t.name for t in env.step(ListToolsAction()).tools])
-    emp = env.step(CallToolAction(tool_name="get_employee", arguments={"employee_id": obs.metadata["ticket"]["requester_id"]}))
+    emp = env.step(
+        CallToolAction(tool_name="get_employee", arguments={"employee_id": obs.metadata["ticket"]["requester_id"]})
+    )
     print("employee status:", emp.result.data["status"])
     final = env.step(
         CallToolAction(

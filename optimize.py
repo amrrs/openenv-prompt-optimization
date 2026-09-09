@@ -125,7 +125,11 @@ def reflect(
         f"## Successful episodes for contrast (one per scenario type; the new prompt must keep these correct)\n\n"
         f"{_render_episodes(_one_per_archetype(successes), max_successes)}\n\n"
         f"This is candidate {attempt} of {attempts}. "
-        + ("Explore a noticeably different structure or emphasis from what a first attempt would produce. " if attempt > 1 else "")
+        + (
+            "Explore a noticeably different structure or emphasis from what a first attempt would produce. "
+            if attempt > 1
+            else ""
+        )
         + "Write the diagnosis, then the full new system prompt inside <system_prompt> tags."
     )
     started = time.time()
@@ -224,10 +228,14 @@ def optimize(
         if verbose:
             print(msg, flush=True)
 
-    log(f"[optimize] policy={policy_model} reflector={reflector_model} train={len(tr)} holdout={len(ho)} rounds={rounds} candidates/round={candidates_per_round}")
+    log(
+        f"[optimize] policy={policy_model} reflector={reflector_model} train={len(tr)} holdout={len(ho)} rounds={rounds} candidates/round={candidates_per_round}"
+    )
     log("[optimize] evaluating baseline on train seeds ...")
     best_prompt = baseline_prompt
-    best_train = run_batch(best_prompt, tr, model=policy_model, env_url=env_url, workers=workers, prompt_name="baseline", verbose=verbose)
+    best_train = run_batch(
+        best_prompt, tr, model=policy_model, env_url=env_url, workers=workers, prompt_name="baseline", verbose=verbose
+    )
     baseline_train = best_train
 
     run = OptimizationRun(
@@ -244,19 +252,42 @@ def optimize(
     for r in range(1, rounds + 1):
         failures = [e for e in best_train.episodes if e.reward < 1.0]
         successes = [e for e in best_train.episodes if e.reward >= 1.0]
-        log(f"[round {r}] best train reward={best_train.mean_reward:.3f}; {len(failures)} imperfect episodes feed the reflector")
+        log(
+            f"[round {r}] best train reward={best_train.mean_reward:.3f}; {len(failures)} imperfect episodes feed the reflector"
+        )
         if not failures:
             log("[optimize] no failures left on the training seeds, stopping early")
             break
         round_record: Dict[str, Any] = {"round": r, "candidates": []}
         for c in range(1, candidates_per_round + 1):
-            proposal = reflect(best_prompt, failures, successes, reflector_model=reflector_model, attempt=c, attempts=candidates_per_round)
+            proposal = reflect(
+                best_prompt,
+                failures,
+                successes,
+                reflector_model=reflector_model,
+                attempt=c,
+                attempts=candidates_per_round,
+            )
             if not proposal["prompt"]:
-                log(f"[round {r} candidate {c}] reflector returned no usable prompt (raw length {proposal['raw_length']}, usage {proposal['usage']}); skipping")
-                round_record["candidates"].append({"candidate": c, "accepted": False, "skipped": True, "reflector_usage": proposal["usage"]})
+                log(
+                    f"[round {r} candidate {c}] reflector returned no usable prompt (raw length {proposal['raw_length']}, usage {proposal['usage']}); skipping"
+                )
+                round_record["candidates"].append(
+                    {"candidate": c, "accepted": False, "skipped": True, "reflector_usage": proposal["usage"]}
+                )
                 continue
-            log(f"[round {r} candidate {c}] reflector returned {len(proposal['prompt'].split())} words in {proposal['latency_s']}s; evaluating ...")
-            cand = run_batch(proposal["prompt"], tr, model=policy_model, env_url=env_url, workers=workers, prompt_name=f"round{r}_cand{c}", verbose=verbose)
+            log(
+                f"[round {r} candidate {c}] reflector returned {len(proposal['prompt'].split())} words in {proposal['latency_s']}s; evaluating ..."
+            )
+            cand = run_batch(
+                proposal["prompt"],
+                tr,
+                model=policy_model,
+                env_url=env_url,
+                workers=workers,
+                prompt_name=f"round{r}_cand{c}",
+                verbose=verbose,
+            )
             accepted = cand.mean_reward > best_train.mean_reward + min_improvement
             round_record["candidates"].append(
                 {
@@ -281,10 +312,26 @@ def optimize(
 
     log("[optimize] evaluating baseline and best prompt on held-out seeds ...")
     run.baseline_holdout = _summary_dict(
-        run_batch(baseline_prompt, ho, model=policy_model, env_url=env_url, workers=workers, prompt_name="baseline/holdout", verbose=verbose)
+        run_batch(
+            baseline_prompt,
+            ho,
+            model=policy_model,
+            env_url=env_url,
+            workers=workers,
+            prompt_name="baseline/holdout",
+            verbose=verbose,
+        )
     )
     run.best_holdout = _summary_dict(
-        run_batch(best_prompt, ho, model=policy_model, env_url=env_url, workers=workers, prompt_name="optimized/holdout", verbose=verbose)
+        run_batch(
+            best_prompt,
+            ho,
+            model=policy_model,
+            env_url=env_url,
+            workers=workers,
+            prompt_name="optimized/holdout",
+            verbose=verbose,
+        )
     )
     save_json(run.to_dict(), out_dir / "optimization_run.json")
     if save_prompt_to is not None:
@@ -332,8 +379,12 @@ if __name__ == "__main__":
             save_prompt_to=Path(args.save_prompt_to),
         )
         print("\n=== Held-out results ===")
-        print(f"baseline : reward={run.baseline_holdout['mean_reward']:.3f} accuracy={run.baseline_holdout['accuracy']:.0%} unauthorized_grants={run.baseline_holdout['unauthorized_grants']}")
-        print(f"optimized: reward={run.best_holdout['mean_reward']:.3f} accuracy={run.best_holdout['accuracy']:.0%} unauthorized_grants={run.best_holdout['unauthorized_grants']}")
+        print(
+            f"baseline : reward={run.baseline_holdout['mean_reward']:.3f} accuracy={run.baseline_holdout['accuracy']:.0%} unauthorized_grants={run.baseline_holdout['unauthorized_grants']}"
+        )
+        print(
+            f"optimized: reward={run.best_holdout['mean_reward']:.3f} accuracy={run.best_holdout['accuracy']:.0%} unauthorized_grants={run.best_holdout['unauthorized_grants']}"
+        )
     finally:
         if proc is not None:
             from env_server import stop_env_server

@@ -16,14 +16,14 @@ from access_request_env.server.access_request_environment import (
 from access_request_env.server.scenarios import (
     ARCHETYPE_EXPECTED,
     ARCHETYPES,
+    HOLDOUT_SEED_BASE,
+    PROJECT_REFERENCES,
+    REFERENCE_MARKERS,
     TRAIN_SEED_BASE,
     archetype_for_seed,
     generate_scenario,
     seed_for_archetype,
 )
-
-
-from access_request_env.server.scenarios import HOLDOUT_SEED_BASE, PROJECT_REFERENCES, REFERENCE_MARKERS
 
 
 def test_every_project_reference_is_detected():
@@ -33,7 +33,9 @@ def test_every_project_reference_is_detected():
 
 @pytest.mark.parametrize(
     "seed",
-    list(range(0, 260)) + list(range(TRAIN_SEED_BASE, TRAIN_SEED_BASE + 52)) + list(range(HOLDOUT_SEED_BASE, HOLDOUT_SEED_BASE + 52)),
+    list(range(0, 260))
+    + list(range(TRAIN_SEED_BASE, TRAIN_SEED_BASE + 52))
+    + list(range(HOLDOUT_SEED_BASE, HOLDOUT_SEED_BASE + 52)),
 )
 def test_generator_matches_policy_engine(seed):
     s = generate_scenario(seed)
@@ -87,7 +89,9 @@ def test_correct_deny_gets_full_reward():
     emp = env.step(CallToolAction(tool_name="get_employee", arguments={"employee_id": ticket["requester_id"]}))
     assert emp.result.data["status"] == "terminated"
     assert emp.done is False and emp.reward == 0.0
-    final = env.step(CallToolAction(tool_name="deny_request", arguments={"reason_code": "employment_status", "note": "Rule 1."}))
+    final = env.step(
+        CallToolAction(tool_name="deny_request", arguments={"reason_code": "employment_status", "note": "Rule 1."})
+    )
     assert final.done is True
     assert final.reward == 1.0
     assert final.metadata["outcome"] == "correct_deny"
@@ -108,7 +112,12 @@ def test_unauthorized_grant_is_heavily_penalised():
     final = env.step(
         CallToolAction(
             tool_name="grant_access",
-            arguments={"employee_id": ticket["requester_id"], "system": ticket["system"], "access_level": ticket["access_level"], "note": "ok"},
+            arguments={
+                "employee_id": ticket["requester_id"],
+                "system": ticket["system"],
+                "access_level": ticket["access_level"],
+                "note": "ok",
+            },
         )
     )
     assert final.reward == -1.0
@@ -121,7 +130,12 @@ def test_correct_grant_and_wrong_target():
     final = env.step(
         CallToolAction(
             tool_name="grant_access",
-            arguments={"employee_id": ticket["requester_id"], "system": ticket["system"], "access_level": ticket["access_level"], "note": "Rule 9."},
+            arguments={
+                "employee_id": ticket["requester_id"],
+                "system": ticket["system"],
+                "access_level": ticket["access_level"],
+                "note": "Rule 9.",
+            },
         )
     )
     assert final.reward == 1.0 and final.metadata["outcome"] == "correct_grant"
@@ -132,7 +146,12 @@ def test_correct_grant_and_wrong_target():
     final = env.step(
         CallToolAction(
             tool_name="grant_access",
-            arguments={"employee_id": ticket["requester_id"], "system": ticket["system"], "access_level": wrong_level, "note": "oops"},
+            arguments={
+                "employee_id": ticket["requester_id"],
+                "system": ticket["system"],
+                "access_level": wrong_level,
+                "note": "oops",
+            },
         )
     )
     assert final.reward == 0.0 and final.metadata["outcome"] == "wrong_grant_target"
@@ -141,17 +160,29 @@ def test_correct_grant_and_wrong_target():
 def test_escalation_routing():
     env = AccessRequestEnvironment()
     _reset(env, "sod_conflict")
-    final = env.step(CallToolAction(tool_name="escalate", arguments={"to": "security", "reason_code": "sod_conflict", "note": "Rule 5."}))
+    final = env.step(
+        CallToolAction(
+            tool_name="escalate", arguments={"to": "security", "reason_code": "sod_conflict", "note": "Rule 5."}
+        )
+    )
     assert final.reward == 1.0 and final.metadata["outcome"] == "correct_escalation"
 
     env = AccessRequestEnvironment()
     _reset(env, "sod_conflict")
-    final = env.step(CallToolAction(tool_name="escalate", arguments={"to": "manager", "reason_code": "missing_approval", "note": "?"}))
+    final = env.step(
+        CallToolAction(
+            tool_name="escalate", arguments={"to": "manager", "reason_code": "missing_approval", "note": "?"}
+        )
+    )
     assert final.reward == 0.7 and final.metadata["outcome"] == "correct_escalation_wrong_routing"
 
     env = AccessRequestEnvironment()
     _reset(env, "clean_grant")
-    final = env.step(CallToolAction(tool_name="escalate", arguments={"to": "manager", "reason_code": "missing_approval", "note": "?"}))
+    final = env.step(
+        CallToolAction(
+            tool_name="escalate", arguments={"to": "manager", "reason_code": "missing_approval", "note": "?"}
+        )
+    )
     assert final.reward == 0.2 and final.metadata["outcome"] == "unnecessary_escalation"
 
 
@@ -162,7 +193,9 @@ def test_invalid_tool_call_and_overrun_penalties():
     assert bad.error is not None and bad.metadata.get("invalid_call") is True
     for _ in range(FREE_TOOL_CALLS + 1):  # push past the free budget
         env.step(CallToolAction(tool_name="get_ticket", arguments={}))
-    final = env.step(CallToolAction(tool_name="deny_request", arguments={"reason_code": "employment_status", "note": "Rule 1."}))
+    final = env.step(
+        CallToolAction(tool_name="deny_request", arguments={"reason_code": "employment_status", "note": "Rule 1."})
+    )
     breakdown = final.metadata["reward_breakdown"]
     assert breakdown["invalid_calls"] == 1
     assert breakdown["tool_call_overrun"] == (FREE_TOOL_CALLS + 3) - FREE_TOOL_CALLS
@@ -184,6 +217,10 @@ def test_step_budget_exhaustion():
 def test_second_decision_is_rejected():
     env = AccessRequestEnvironment()
     _reset(env, "terminated")
-    env.step(CallToolAction(tool_name="deny_request", arguments={"reason_code": "employment_status", "note": "Rule 1."}))
-    again = env.step(CallToolAction(tool_name="escalate", arguments={"to": "manager", "reason_code": "other", "note": "x"}))
+    env.step(
+        CallToolAction(tool_name="deny_request", arguments={"reason_code": "employment_status", "note": "Rule 1."})
+    )
+    again = env.step(
+        CallToolAction(tool_name="escalate", arguments={"to": "manager", "reason_code": "other", "note": "x"})
+    )
     assert again.done is True

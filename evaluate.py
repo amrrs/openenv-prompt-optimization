@@ -10,7 +10,16 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Dict, List
 
-from agent import DEFAULT_ENV_URL, DEFAULT_POLICY_MODEL, RESULTS_DIR, BatchSummary, holdout_seeds, load_prompt, run_batch, save_json
+from agent import (
+    DEFAULT_ENV_URL,
+    DEFAULT_POLICY_MODEL,
+    RESULTS_DIR,
+    BatchSummary,
+    holdout_seeds,
+    load_prompt,
+    run_batch,
+    save_json,
+)
 
 
 def evaluate(
@@ -25,7 +34,11 @@ def evaluate(
     summaries: List[BatchSummary] = []
     for model in models:
         for name, prompt in prompts.items():
-            summaries.append(run_batch(prompt, seeds, model=model, env_url=env_url, workers=workers, prompt_name=name, verbose=verbose))
+            summaries.append(
+                run_batch(
+                    prompt, seeds, model=model, env_url=env_url, workers=workers, prompt_name=name, verbose=verbose
+                )
+            )
     return summaries
 
 
@@ -46,7 +59,9 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Evaluate prompts across models on held-out seeds.")
-    parser.add_argument("--prompts", nargs="+", default=["baseline", "optimized"], help="prompt names in prompts/ or paths")
+    parser.add_argument(
+        "--prompts", nargs="+", default=["baseline", "optimized"], help="prompt names in prompts/ or paths"
+    )
     parser.add_argument("--models", nargs="+", default=[DEFAULT_POLICY_MODEL])
     parser.add_argument("--n", type=int, default=26)
     parser.add_argument("--env-url", default=DEFAULT_ENV_URL)
@@ -62,7 +77,9 @@ if __name__ == "__main__":
         proc = start_env_server(port=int(args.env_url.rsplit(":", 1)[-1]))
     try:
         prompts = {Path(p).stem if Path(p).exists() else p: load_prompt(p) for p in args.prompts}
-        summaries = evaluate(prompts, args.models, seeds=holdout_seeds(args.n), env_url=args.env_url, workers=args.workers)
+        summaries = evaluate(
+            prompts, args.models, seeds=holdout_seeds(args.n), env_url=args.env_url, workers=args.workers
+        )
         table = to_markdown(summaries)
         print("\n" + table)
         out = Path(args.out)

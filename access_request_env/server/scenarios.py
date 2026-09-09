@@ -170,15 +170,60 @@ ALL_ROLES = list(ROLE_DEPARTMENTS)
 TRAININGS = ["data-handling", "pii-basics", "secure-operations"]
 
 FIRST_NAMES = [
-    "Aisha", "Bruno", "Chen", "Dana", "Elif", "Farid", "Grace", "Hiro", "Ines",
-    "Jonas", "Kavya", "Lars", "Maya", "Nikolai", "Olu", "Priya", "Quentin",
-    "Rosa", "Sven", "Tomas", "Uma", "Viktor", "Wen", "Ximena", "Yusuf", "Zara",
+    "Aisha",
+    "Bruno",
+    "Chen",
+    "Dana",
+    "Elif",
+    "Farid",
+    "Grace",
+    "Hiro",
+    "Ines",
+    "Jonas",
+    "Kavya",
+    "Lars",
+    "Maya",
+    "Nikolai",
+    "Olu",
+    "Priya",
+    "Quentin",
+    "Rosa",
+    "Sven",
+    "Tomas",
+    "Uma",
+    "Viktor",
+    "Wen",
+    "Ximena",
+    "Yusuf",
+    "Zara",
 ]
 LAST_NAMES = [
-    "Adeyemi", "Bergstrom", "Costa", "Dubois", "Eriksen", "Fischer", "Garcia",
-    "Hansen", "Ivanova", "Jansen", "Kowalski", "Lindqvist", "Moreau", "Novak",
-    "Okafor", "Petrov", "Quinn", "Rossi", "Schmidt", "Tanaka", "Uddin",
-    "Varga", "Weber", "Xu", "Yilmaz", "Zimmermann",
+    "Adeyemi",
+    "Bergstrom",
+    "Costa",
+    "Dubois",
+    "Eriksen",
+    "Fischer",
+    "Garcia",
+    "Hansen",
+    "Ivanova",
+    "Jansen",
+    "Kowalski",
+    "Lindqvist",
+    "Moreau",
+    "Novak",
+    "Okafor",
+    "Petrov",
+    "Quinn",
+    "Rossi",
+    "Schmidt",
+    "Tanaka",
+    "Uddin",
+    "Varga",
+    "Weber",
+    "Xu",
+    "Yilmaz",
+    "Zimmermann",
 ]
 
 PROJECT_REFERENCES = [
@@ -556,8 +601,7 @@ def generate_scenario(seed: int) -> Scenario:
         # make sure we do not accidentally create a SoD conflict
         for conflict in policy["sod_conflicts"]:
             existing = [
-                g for g in existing
-                if not (g["system"] == conflict["system"] and g["level"] == conflict["level"])
+                g for g in existing if not (g["system"] == conflict["system"] and g["level"] == conflict["level"])
             ]
 
     requester_id = f"E-{rng.randint(10000, 99999)}"
@@ -619,7 +663,9 @@ def generate_scenario(seed: int) -> Scenario:
         justification += rng.choice(PRESSURE_PHRASES)
 
     ticket_id = f"AR-{seed:06d}"
-    submitted = f"2026-{rng.randint(1, 9):02d}-{rng.randint(1, 28):02d}T{rng.randint(7, 18):02d}:{rng.randint(0, 59):02d}:00Z"
+    submitted = (
+        f"2026-{rng.randint(1, 9):02d}-{rng.randint(1, 28):02d}T{rng.randint(7, 18):02d}:{rng.randint(0, 59):02d}:00Z"
+    )
     ticket = Ticket(
         ticket_id=ticket_id,
         requester_id=requester_id,

@@ -19,7 +19,9 @@ def md(text: str) -> None:
 
 
 def code(text: str) -> None:
-    cells.append({"cell_type": "code", "metadata": {}, "execution_count": None, "outputs": [], "source": text.strip("\n")})
+    cells.append(
+        {"cell_type": "code", "metadata": {}, "execution_count": None, "outputs": [], "source": text.strip("\n")}
+    )
 
 
 md(r"""
@@ -61,7 +63,10 @@ You need a Nebius Token Factory API key ([get one here](https://tokenfactory.neb
 """)
 
 code(r"""
-import os, sys, subprocess, pathlib
+import os
+import pathlib
+import subprocess
+import sys
 
 IN_COLAB = "google.colab" in sys.modules
 if IN_COLAB:

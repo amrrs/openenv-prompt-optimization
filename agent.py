@@ -219,7 +219,13 @@ def run_episode(
 
                 for tc in msg.tool_calls:
                     if done:
-                        messages.append({"role": "tool", "tool_call_id": tc.id, "content": json.dumps({"error": "Episode already closed."})})
+                        messages.append(
+                            {
+                                "role": "tool",
+                                "tool_call_id": tc.id,
+                                "content": json.dumps({"error": "Episode already closed."}),
+                            }
+                        )
                         continue
                     try:
                         arguments = json.loads(tc.function.arguments or "{}")
@@ -227,7 +233,14 @@ def run_episode(
                             raise ValueError("arguments must be a JSON object")
                     except ValueError as exc:
                         payload: Any = {"error": f"Could not parse tool arguments as JSON: {exc}"}
-                        tool_log.append({"tool": tc.function.name, "arguments": tc.function.arguments, "result": payload, "client_side_error": True})
+                        tool_log.append(
+                            {
+                                "tool": tc.function.name,
+                                "arguments": tc.function.arguments,
+                                "result": payload,
+                                "client_side_error": True,
+                            }
+                        )
                         messages.append({"role": "tool", "tool_call_id": tc.id, "content": json.dumps(payload)})
                         continue
 
@@ -343,7 +356,9 @@ def run_batch(
     results: Dict[int, EpisodeResult] = {}
     with ThreadPoolExecutor(max_workers=workers) as pool:
         futures = {
-            pool.submit(run_episode, system_prompt, s, model=model, env_url=env_url, llm=llm, temperature=temperature): s
+            pool.submit(
+                run_episode, system_prompt, s, model=model, env_url=env_url, llm=llm, temperature=temperature
+            ): s
             for s in seeds
         }
         for i, fut in enumerate(as_completed(futures), start=1):
@@ -389,9 +404,19 @@ if __name__ == "__main__":
         proc = start_env_server(port=port)
     try:
         seeds = train_seeds(args.n) if args.seeds == "train" else holdout_seeds(args.n)
-        summary = run_batch(load_prompt(args.prompt), seeds, model=args.model, env_url=args.env_url, workers=args.workers, prompt_name=args.prompt)
+        summary = run_batch(
+            load_prompt(args.prompt),
+            seeds,
+            model=args.model,
+            env_url=args.env_url,
+            workers=args.workers,
+            prompt_name=args.prompt,
+        )
         for e in summary.episodes:
-            print(f"  seed={e.seed} {e.scenario_type or '?':<26} reward={e.reward:+.2f} outcome={e.outcome} steps={e.steps}" + (f" error={e.error}" if e.error else ""))
+            print(
+                f"  seed={e.seed} {e.scenario_type or '?':<26} reward={e.reward:+.2f} outcome={e.outcome} steps={e.steps}"
+                + (f" error={e.error}" if e.error else "")
+            )
         if args.out:
             save_json(summary.to_dict(include_messages=True), Path(args.out))
     finally:

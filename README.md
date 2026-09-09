@@ -158,17 +158,23 @@ The client is async by default; `.sync()` gives a blocking wrapper:
 from access_request_env import AccessRequestEnv, CallToolAction, tool_payload
 
 with AccessRequestEnv(base_url="http://127.0.0.1:8010").sync() as env:
-    result = env.reset(seed=1003)                       # archetype: terminated requester
+    result = env.reset(seed=1003)  # archetype: terminated requester
     ticket = result.observation.metadata["ticket"]
     print([t.name for t in env.list_tools()])
 
     r = env.step(CallToolAction(tool_name="get_employee", arguments={"employee_id": ticket["requester_id"]}))
-    print(tool_payload(r.observation)["status"], r.reward, r.done)      # terminated 0.0 False
+    print(tool_payload(r.observation)["status"], r.reward, r.done)  # terminated 0.0 False
 
-    r = env.step(CallToolAction(tool_name="deny_request",
-                                arguments={"reason_code": "employment_status",
-                                           "note": "Rule 1: HR record shows the requester is terminated."}))
-    print(r.reward, r.done, r.observation.metadata["outcome"])          # 1.0 True correct_deny
+    r = env.step(
+        CallToolAction(
+            tool_name="deny_request",
+            arguments={
+                "reason_code": "employment_status",
+                "note": "Rule 1: HR record shows the requester is terminated.",
+            },
+        )
+    )
+    print(r.reward, r.done, r.observation.metadata["outcome"])  # 1.0 True correct_deny
 ```
 
 ## 4. A Token Factory model as the policy
@@ -180,11 +186,19 @@ each.
 
 ```python
 from openai import OpenAI
+
 llm = OpenAI(base_url="https://api.tokenfactory.nebius.com/v1", api_key=os.environ["NEBIUS_API_KEY"])
-response = llm.chat.completions.create(model="zai-org/GLM-5.3-Flash", messages=messages,
-                                       tools=mcp_tools_to_openai(env.list_tools()), tool_choice="auto")
+tools = mcp_tools_to_openai(env.list_tools())
+
+response = llm.chat.completions.create(
+    model="zai-org/GLM-5.3-Flash",
+    messages=messages,
+    tools=tools,
+    tool_choice="auto",
+)
 for tc in response.choices[0].message.tool_calls:
-    step = env.step(CallToolAction(tool_name=tc.function.name, arguments=json.loads(tc.function.arguments)))
+    action = CallToolAction(tool_name=tc.function.name, arguments=json.loads(tc.function.arguments))
+    step = env.step(action)
 ```
 
 The baseline system prompt is deliberately the kind of thing a team writes on day one
