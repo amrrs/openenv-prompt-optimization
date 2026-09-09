@@ -24,14 +24,10 @@
 ## What you will build
 
 [OpenEnv](https://github.com/huggingface/OpenEnv) is an e2e framework for creating, deploying and using isolated
-execution environments for agentic RL training, built using Gymnasium style simple APIs. Environments expose `reset()` / `step()` / `state()`, run as servers (locally, in Docker, or as Hugging Face Spaces),
-and can compute rewards internally.
-
+execution environments for agentic RL training, built using Gymnasium style simple APIs.
 [Nebius Token Factory](https://tokenfactory.nebius.com/) serves open models behind an OpenAI-compatible API.
-You cannot touch the weights of a hosted model, but you can still improve an agent built on one, because the
-environment gives you a reward signal and the prompt is a free variable.
 
-This tutorial puts the two together:
+In this tutorial you will:
 
 1. **Build** an OpenEnv environment that simulates an IT service desk handling access requests. The agent
    investigates a ticket through MCP tools and must grant, deny or escalate. Reward is computed inside the
