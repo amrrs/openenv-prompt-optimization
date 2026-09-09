@@ -23,7 +23,7 @@
 
 ## What you will build
 
-[OpenEnv](https://github.com/huggingface/OpenEnv) is Hugging Face's and Meta PyTorch's framework for agentic
+[OpenEnv](https://github.com/huggingface/OpenEnv) is Hugging Face's framework for agentic
 environments: Gymnasium-style `reset()` / `step()` / `state()` servers that run in containers, expose tools over
 MCP, compute rewards inside the environment, and plug into RL trainers such as TRL.
 
