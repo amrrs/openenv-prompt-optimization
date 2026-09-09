@@ -41,7 +41,7 @@ In this tutorial you will:
 
 Everything runs on a laptop. No GPU, no training job.
 
-![Architecture: Token Factory models (policy, reflector, optional judge), the agent loop and prompt optimizer on your laptop, and the OpenEnv environment server with MCP tools, scenario generator and reward](images/architecture.svg)
+![The prompt optimization loop: the policy model runs the agent with prompt v_n against the OpenEnv environment, low-reward episodes go to the reflector model, which writes prompt v_n+1, re-evaluated on the same seeds and kept only if the mean reward improves; results strip shows the measured before/after on held-out tickets](images/architecture.svg)
 
 ### OpenEnv components used in this tutorial
 
