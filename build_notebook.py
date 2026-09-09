@@ -37,7 +37,6 @@ This notebook walks through the tutorial in [README.md](README.md):
 4. Optimize the agent's system prompt against the environment's reward with a stronger Token Factory model as the "reflector".
 5. Check the optimized prompt on held-out scenarios and on other models.
 
-Only the prompt changes. The model weights never do, which is exactly why this works with hosted models.
 
 ### OpenEnv components used in this tutorial
 
