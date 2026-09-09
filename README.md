@@ -23,9 +23,8 @@
 
 ## What you will build
 
-[OpenEnv](https://github.com/huggingface/OpenEnv), in its own words, is "an e2e framework for creating, deploying
-and using isolated execution environments for agentic RL training, built using Gymnasium style simple APIs."
-Environments expose `reset()` / `step()` / `state()`, run as servers (locally, in Docker, or as Hugging Face Spaces),
+[OpenEnv](https://github.com/huggingface/OpenEnv) is an e2e framework for creating, deploying and using isolated
+execution environments for agentic RL training, built using Gymnasium style simple APIs. Environments expose `reset()` / `step()` / `state()`, run as servers (locally, in Docker, or as Hugging Face Spaces),
 and can compute rewards internally.
 
 [Nebius Token Factory](https://tokenfactory.nebius.com/) serves open models behind an OpenAI-compatible API.
