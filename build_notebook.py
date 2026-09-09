@@ -38,6 +38,18 @@ This notebook walks through the tutorial in [README.md](README.md):
 5. Check the optimized prompt on held-out scenarios and on other models.
 
 Only the prompt changes. The model weights never do, which is exactly why this works with hosted models.
+
+### OpenEnv components used in this tutorial
+
+| OpenEnv piece | Where | What it does here |
+|---|---|---|
+| `openenv init` package layout, `openenv.yaml` manifest | `access_request_env/` | Standard environment package that `openenv validate` / `build` / `push` understand |
+| `MCPEnvironment` + FastMCP tools (RFC 003) | `server/access_request_environment.py` | The eight tools are the agent's action space; agents act with `CallToolAction`, discover tools with `ListToolsAction` |
+| `reset(seed)` / `step()` / `state()` with a custom `State` | same file, `models.py` | Seeded, reproducible episodes; the terminal step carries the reward and reveals the ground truth |
+| `create_app` (HTTP + WebSocket + `/web` UI) | `server/app.py` | Serves the environment with 16 concurrent sessions, one per parallel episode |
+| `MCPToolClient` typed client and `.sync()` wrapper | `client.py`, `agent.py` | The Token Factory agent connects, lists tools, and steps through the WebSocket session |
+| `Rubric`, `LLMJudge`, `OpenAIClient` (RFC 004) | `NoteQualityJudge` | A Token Factory model as an in-environment judge that adds to the reward |
+| `openenv validate` / `openenv build` / `openenv push` | section 7 | Ship the same environment as a Docker image or a Hugging Face Space |
 """)
 
 md(r"""
