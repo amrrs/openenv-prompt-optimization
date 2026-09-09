@@ -118,11 +118,21 @@ class EpisodeResult:
     def correct(self) -> bool:
         return self.outcome is not None and self.outcome.startswith("correct")
 
-    def to_dict(self, include_messages: bool = False) -> Dict[str, Any]:
+    def to_dict(self, include_messages: bool = False, include_trajectory: bool = False) -> Dict[str, Any]:
+        """Serialise the episode.
+
+        The default is a compact record (decision, ground truth, reward, counters) that is small enough to commit.
+        ``include_trajectory`` adds the tool trace and ticket, ``include_messages`` the full chat transcript.
+        """
         d = asdict(self)
         d["correct"] = self.correct
         if not include_messages:
             d.pop("messages", None)
+        if not include_trajectory:
+            d.pop("tool_calls", None)
+            d.pop("ticket", None)
+            if d.get("decision"):
+                d["decision"] = {k: v for k, v in d["decision"].items() if k != "note"}
         return d
 
 
@@ -302,9 +312,11 @@ class BatchSummary:
     outcomes: Dict[str, int]
     episodes: List[EpisodeResult] = field(default_factory=list)
 
-    def to_dict(self, include_messages: bool = False) -> Dict[str, Any]:
+    def to_dict(self, include_messages: bool = False, include_trajectory: bool = False) -> Dict[str, Any]:
         d = asdict(self)
-        d["episodes"] = [e.to_dict(include_messages=include_messages) for e in self.episodes]
+        d["episodes"] = [
+            e.to_dict(include_messages=include_messages, include_trajectory=include_trajectory) for e in self.episodes
+        ]
         return d
 
     def one_line(self) -> str:
@@ -418,7 +430,7 @@ if __name__ == "__main__":
                 + (f" error={e.error}" if e.error else "")
             )
         if args.out:
-            save_json(summary.to_dict(include_messages=True), Path(args.out))
+            save_json(summary.to_dict(include_messages=True, include_trajectory=True), Path(args.out))
     finally:
         if proc is not None:
             from env_server import stop_env_server

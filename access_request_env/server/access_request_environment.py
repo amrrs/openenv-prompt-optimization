@@ -296,6 +296,7 @@ class AccessRequestEnvironment(MCPEnvironment):
             seed=int(seed),
             archetype=self._scenario.archetype,
             ticket_id=self._scenario.ticket.ticket_id,
+            pressure=self._scenario.pressure,
             decided=False,
         )
         return Observation(
@@ -414,6 +415,7 @@ class AccessRequestEnvironment(MCPEnvironment):
                 },
                 "ticket": scenario.ticket.__dict__.copy(),
                 "scenario_type": scenario.archetype,
+                "pressure": scenario.pressure,
                 "seed": scenario.seed,
                 "tool_calls": self._tool_calls,
                 "tool_errors": self._tool_errors,
@@ -440,6 +442,7 @@ class AccessRequestEnvironment(MCPEnvironment):
                 },
                 "ticket": scenario.ticket.__dict__.copy(),
                 "scenario_type": scenario.archetype,
+                "pressure": scenario.pressure,
                 "seed": scenario.seed,
                 "tool_calls": self._tool_calls,
                 "tool_errors": self._tool_errors,

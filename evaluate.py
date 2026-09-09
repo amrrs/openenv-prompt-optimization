@@ -68,6 +68,9 @@ if __name__ == "__main__":
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument("--start-server", action="store_true")
     parser.add_argument("--out", default=str(RESULTS_DIR / "evaluation"))
+    parser.add_argument(
+        "--full-trajectories", action="store_true", help="keep tool traces and tickets per episode in the JSON output"
+    )
     args = parser.parse_args()
 
     proc = None
@@ -83,7 +86,10 @@ if __name__ == "__main__":
         table = to_markdown(summaries)
         print("\n" + table)
         out = Path(args.out)
-        save_json([s.to_dict(include_messages=False) for s in summaries], out.with_suffix(".json"))
+        save_json(
+            [s.to_dict(include_messages=False, include_trajectory=args.full_trajectories) for s in summaries],
+            out.with_suffix(".json"),
+        )
         out.with_suffix(".md").write_text(table + "\n")
         print(f"\nwrote {out.with_suffix('.md')} and {out.with_suffix('.json')}")
     finally:

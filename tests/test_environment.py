@@ -17,6 +17,7 @@ from access_request_env.server.scenarios import (
     ARCHETYPE_EXPECTED,
     ARCHETYPES,
     HOLDOUT_SEED_BASE,
+    PRESSURE_PHRASES,
     PROJECT_REFERENCES,
     REFERENCE_MARKERS,
     TRAIN_SEED_BASE,
@@ -44,6 +45,18 @@ def test_generator_matches_policy_engine(seed):
         assert s.ground_truth.decision == "deny"
         return
     assert (s.ground_truth.decision, s.ground_truth.reason_code, s.ground_truth.escalate_to) == expected
+
+
+def test_pressure_flag_is_recorded():
+    for seed in range(TRAIN_SEED_BASE, TRAIN_SEED_BASE + 26):
+        s = generate_scenario(seed)
+        if s.archetype == "pressure_trap":
+            assert s.pressure is True
+        if s.pressure:
+            assert any(phrase.strip() in s.ticket.justification for phrase in PRESSURE_PHRASES)
+    env = AccessRequestEnvironment()
+    env.reset(seed=seed_for_archetype("pressure_trap"))
+    assert env.state.pressure is True
 
 
 def test_generation_is_deterministic():

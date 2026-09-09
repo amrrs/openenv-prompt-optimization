@@ -9,6 +9,7 @@ from the notebook or with ``--start-server`` on the CLI scripts.
 from __future__ import annotations
 
 import os
+import pathlib
 import subprocess
 import sys
 import time
@@ -31,14 +32,16 @@ def start_env_server(
     if judge_model:
         env["ACCESS_ENV_JUDGE_MODEL"] = judge_model
     env["ACCESS_ENV_POLICY_TOOL"] = "1" if expose_policy_tool else "0"
-    log = open(log_path or (HERE / "results" / f"env_server_{port}.log"), "a")
-    proc = subprocess.Popen(
-        [sys.executable, "-m", "access_request_env.server.app", "--port", str(port), "--host", "127.0.0.1"],
-        cwd=str(HERE),
-        env=env,
-        stdout=log,
-        stderr=subprocess.STDOUT,
-    )
+    log_file = pathlib.Path(log_path) if log_path else HERE / "results" / f"env_server_{port}.log"
+    log_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(log_file, "a") as log:  # the child inherits the descriptor; the parent's handle can close
+        proc = subprocess.Popen(
+            [sys.executable, "-m", "access_request_env.server.app", "--port", str(port), "--host", "127.0.0.1"],
+            cwd=str(HERE),
+            env=env,
+            stdout=log,
+            stderr=subprocess.STDOUT,
+        )
     wait_for_health(f"http://127.0.0.1:{port}", process=proc)
     return proc
 

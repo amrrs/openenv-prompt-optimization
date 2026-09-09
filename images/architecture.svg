@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="640" viewBox="0 0 1120 640" font-family="Inter, Helvetica, Arial, sans-serif" font-size="14">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4b5563"/>
+    </marker>
+    <marker id="arrow-accent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b45309"/>
+    </marker>
+  </defs>
+  <rect width="1120" height="640" fill="#ffffff"/>
+  <text x="560" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#111827">Prompt optimization with OpenEnv and Nebius Token Factory</text>
+
+  <!-- ===== Token Factory column ===== -->
+  <rect x="24" y="64" width="300" height="392" rx="12" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="174" y="92" text-anchor="middle" font-size="16" font-weight="700" fill="#312e81">Nebius Token Factory</text>
+  <text x="174" y="112" text-anchor="middle" fill="#4338ca">OpenAI-compatible API, hosted open models</text>
+
+  <rect x="44" y="136" width="260" height="84" rx="8" fill="#ffffff" stroke="#a5b4fc"/>
+  <text x="174" y="160" text-anchor="middle" font-weight="700" fill="#111827">Policy model</text>
+  <text x="174" y="180" text-anchor="middle" fill="#374151">GLM-5.3-Flash (default)</text>
+  <text x="174" y="200" text-anchor="middle" fill="#6b7280">tool calling, temperature 0</text>
+
+  <rect x="44" y="236" width="260" height="84" rx="8" fill="#ffffff" stroke="#a5b4fc"/>
+  <text x="174" y="260" text-anchor="middle" font-weight="700" fill="#111827">Reflector model</text>
+  <text x="174" y="280" text-anchor="middle" fill="#374151">Kimi K3</text>
+  <text x="174" y="300" text-anchor="middle" fill="#6b7280">diagnoses failures, rewrites the prompt</text>
+
+  <rect x="44" y="336" width="260" height="84" rx="8" fill="#ffffff" stroke="#a5b4fc" stroke-dasharray="6 4"/>
+  <text x="174" y="360" text-anchor="middle" font-weight="700" fill="#111827">Judge model (optional)</text>
+  <text x="174" y="380" text-anchor="middle" fill="#374151">any Token Factory model</text>
+  <text x="174" y="400" text-anchor="middle" fill="#6b7280">scores the decision note, +0.2 max</text>
+
+  <!-- ===== Laptop column ===== -->
+  <rect x="384" y="64" width="330" height="392" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="549" y="92" text-anchor="middle" font-size="16" font-weight="700" fill="#14532d">Your laptop</text>
+  <text x="549" y="112" text-anchor="middle" fill="#166534">agent.py, optimize.py, evaluate.py</text>
+
+  <rect x="404" y="136" width="290" height="124" rx="8" fill="#ffffff" stroke="#86efac"/>
+  <text x="549" y="160" text-anchor="middle" font-weight="700" fill="#111827">Agent loop (run_episode)</text>
+  <text x="418" y="184" fill="#374151">1. env.reset(seed) → ticket</text>
+  <text x="418" y="204" fill="#374151">2. list_tools() → OpenAI tool schemas</text>
+  <text x="418" y="224" fill="#374151">3. chat.completions → tool call</text>
+  <text x="418" y="244" fill="#374151">4. env.step(CallToolAction) until done</text>
+
+  <rect x="404" y="276" width="290" height="164" rx="8" fill="#ffffff" stroke="#86efac"/>
+  <text x="549" y="300" text-anchor="middle" font-weight="700" fill="#111827">Prompt optimizer (optimize.py)</text>
+  <text x="418" y="324" fill="#374151">a. run_batch(prompt, train seeds)</text>
+  <text x="418" y="344" fill="#374151">b. collect episodes with reward &lt; 1</text>
+  <text x="418" y="364" fill="#374151">c. reflector writes a new system prompt</text>
+  <text x="418" y="384" fill="#374151">d. re-evaluate, keep if mean reward improves</text>
+  <text x="418" y="404" fill="#374151">e. report on held-out seeds</text>
+  <text x="418" y="426" fill="#6b7280" font-style="italic">only the prompt changes, never the weights</text>
+
+  <!-- ===== OpenEnv column ===== -->
+  <rect x="774" y="64" width="322" height="392" rx="12" fill="#fff7ed" stroke="#ea580c" stroke-width="1.5"/>
+  <text x="935" y="92" text-anchor="middle" font-size="16" font-weight="700" fill="#7c2d12">OpenEnv environment server</text>
+  <text x="935" y="112" text-anchor="middle" fill="#9a3412">access_request_env · FastAPI + WebSocket /ws</text>
+
+  <rect x="794" y="136" width="282" height="104" rx="8" fill="#ffffff" stroke="#fdba74"/>
+  <text x="935" y="160" text-anchor="middle" font-weight="700" fill="#111827">MCPEnvironment (RFC 003)</text>
+  <text x="808" y="184" fill="#374151">read tools: get_ticket, get_employee,</text>
+  <text x="808" y="202" fill="#374151">get_system_policy, check_manager_approval</text>
+  <text x="808" y="224" fill="#374151">terminal: grant_access, deny_request, escalate</text>
+
+  <rect x="794" y="256" width="282" height="84" rx="8" fill="#ffffff" stroke="#fdba74"/>
+  <text x="935" y="280" text-anchor="middle" font-weight="700" fill="#111827">Scenario generator + policy engine</text>
+  <text x="808" y="304" fill="#374151">seeded tickets, 13 archetypes, mocked HR data</text>
+  <text x="808" y="324" fill="#374151">decide() = hidden ground truth (9 ordered rules)</text>
+
+  <rect x="794" y="356" width="282" height="84" rx="8" fill="#ffffff" stroke="#fdba74"/>
+  <text x="935" y="380" text-anchor="middle" font-weight="700" fill="#111827">Reward on the terminal step</text>
+  <text x="808" y="404" fill="#374151">+1 correct · −1 unauthorized grant · +0.2 needless</text>
+  <text x="808" y="424" fill="#374151">escalation · penalties for extra / invalid calls</text>
+
+  <!-- ===== arrows: laptop <-> token factory ===== -->
+  <line x1="404" y1="178" x2="304" y2="178" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+  <text x="354" y="166" text-anchor="middle" fill="#4b5563" font-size="11">chat.completions</text>
+  <text x="354" y="196" text-anchor="middle" fill="#4b5563" font-size="11">with tool schemas</text>
+
+  <line x1="404" y1="364" x2="304" y2="278" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+  <text x="330" y="310" text-anchor="start" fill="#4b5563" font-size="12">failures in,</text>
+  <text x="330" y="326" text-anchor="start" fill="#4b5563" font-size="12">new prompt out</text>
+
+  <!-- ===== arrows: laptop <-> openenv ===== -->
+  <line x1="694" y1="178" x2="794" y2="178" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+  <text x="744" y="164" text-anchor="middle" fill="#4b5563" font-size="11">reset(seed)</text>
+  <text x="744" y="198" text-anchor="middle" fill="#4b5563" font-size="11">step(action)</text>
+  <text x="744" y="214" text-anchor="middle" fill="#4b5563" font-size="11">→ reward, done</text>
+
+  <line x1="694" y1="340" x2="794" y2="300" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="744" y="336" text-anchor="middle" fill="#4b5563" font-size="12">same seeds for</text>
+  <text x="744" y="352" text-anchor="middle" fill="#4b5563" font-size="12">every candidate</text>
+
+  <!-- ===== judge: env -> token factory (curved, dashed) ===== -->
+  <path d="M 794 420 C 700 500, 420 500, 304 400" fill="none" stroke="#b45309" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#arrow-accent)"/>
+  <text x="549" y="488" text-anchor="middle" fill="#b45309" font-size="12">NoteQualityJudge (OpenEnv Rubric / LLMJudge) calls Token Factory from inside the environment</text>
+
+  <!-- ===== bottom: shipping ===== -->
+  <rect x="24" y="528" width="1072" height="84" rx="12" fill="#f9fafb" stroke="#d1d5db"/>
+  <text x="560" y="556" text-anchor="middle" font-weight="700" fill="#111827">Same environment package, shipped with the OpenEnv toolchain</text>
+  <text x="560" y="580" text-anchor="middle" fill="#374151">openenv validate  ·  openenv build → Docker image for a private VM or Kubernetes  ·  openenv push → Hugging Face Space</text>
+  <text x="560" y="600" text-anchor="middle" fill="#6b7280">later: the same environment for TRL GRPO training or for sampling trajectories to fine-tune on</text>
+</svg>

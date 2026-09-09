@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "IT access-request service desk environment for OpenEnv (Nebius Token Factory cookbook)"
 requires-python = ">=3.10"
 dependencies = [
-    "openenv>=0.4.1",
+    "openenv==0.4.1",
     "fastapi>=0.115.0",
     "uvicorn>=0.24.0",
     "fastmcp>=2.0.0",

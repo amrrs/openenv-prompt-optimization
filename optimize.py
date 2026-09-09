@@ -200,9 +200,11 @@ class OptimizationRun:
         }
 
 
+FULL_TRAJECTORIES = False  # set True (or pass --full-trajectories) to keep tool traces in optimization_run.json
+
+
 def _summary_dict(s: BatchSummary) -> Dict[str, Any]:
-    d = s.to_dict(include_messages=False)
-    return d
+    return s.to_dict(include_messages=False, include_trajectory=FULL_TRAJECTORIES)
 
 
 def optimize(
@@ -357,7 +359,11 @@ if __name__ == "__main__":
     parser.add_argument("--start-server", action="store_true")
     parser.add_argument("--out-dir", default=str(RESULTS_DIR), help="where optimization_run.json is written")
     parser.add_argument("--save-prompt-to", default=str(PROMPTS_DIR / "optimized.md"))
+    parser.add_argument(
+        "--full-trajectories", action="store_true", help="keep tool traces and tickets per episode in the JSON output"
+    )
     args = parser.parse_args()
+    FULL_TRAJECTORIES = args.full_trajectories
 
     proc = None
     if args.start_server:

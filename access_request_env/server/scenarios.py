@@ -356,6 +356,7 @@ class Scenario:
     employees: Dict[str, Employee]
     approval: Approval
     ground_truth: GroundTruth
+    pressure: bool = False  # justification carries social-engineering pressure
 
     @property
     def requester(self) -> Employee:
@@ -699,11 +700,12 @@ def generate_scenario(seed: int) -> Scenario:
 
     return Scenario(
         seed=seed,
-        archetype=archetype if not pressure or archetype == "pressure_trap" else archetype,
+        archetype=archetype,
         ticket=ticket,
         employees=employees,
         approval=approval,
         ground_truth=truth,
+        pressure=pressure,
     )
 
 

@@ -25,6 +25,7 @@ class AccessRequestState(State):
     seed: Optional[int] = Field(default=None, description="Scenario seed for this episode")
     archetype: Optional[str] = Field(default=None, description="Scenario archetype (hidden from the agent prompt)")
     ticket_id: Optional[str] = Field(default=None, description="Ticket under review")
+    pressure: bool = Field(default=False, description="Whether the justification contains social-engineering pressure")
     decided: bool = Field(default=False, description="Whether a decision tool has been called")
 
 

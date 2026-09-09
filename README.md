@@ -41,12 +41,14 @@ In this tutorial you will:
 
 Everything runs on a laptop. No GPU, no training job.
 
+![Architecture: Token Factory models (policy, reflector, optional judge), the agent loop and prompt optimizer on your laptop, and the OpenEnv environment server with MCP tools, scenario generator and reward](images/architecture.svg)
+
 ### OpenEnv components used in this tutorial
 
 | OpenEnv piece | Where | What it does here |
 |---|---|---|
 | `openenv init` package layout, `openenv.yaml` manifest | `access_request_env/` | Standard environment package that `openenv validate` / `build` / `push` understand |
-| `MCPEnvironment` + FastMCP tools (RFC 003) | `server/access_request_environment.py` | The eight tools are the agent's action space; agents act with `CallToolAction`, discover tools with `ListToolsAction` |
+| `MCPEnvironment` + FastMCP tools (RFC 003) | `server/access_request_environment.py` | The seven tools (eight with `ACCESS_ENV_POLICY_TOOL=1`) are the agent's action space; agents act with `CallToolAction`, discover tools with `ListToolsAction` |
 | `reset(seed)` / `step()` / `state()` with a custom `State` | same file, `models.py` | Seeded, reproducible episodes; the terminal step carries the reward and reveals the ground truth |
 | `create_app` (HTTP + WebSocket + `/web` UI) | `server/app.py` | Serves the environment with 16 concurrent sessions, one per parallel episode |
 | `MCPToolClient` typed client and `.sync()` wrapper | `client.py`, `agent.py` | The Token Factory agent connects, lists tools, and steps through the WebSocket session |
@@ -76,8 +78,8 @@ cp env.example .env         # add your NEBIUS_API_KEY
 uv run pytest -q            # 376 deterministic tests for the environment, no API calls
 ```
 
-The project pins `openenv==0.4.1` (the PyPI package was renamed from `openenv-core`; the API is moving fast).
-Python 3.10 or newer.
+The project and the environment package both pin `openenv==0.4.1` (the PyPI package was renamed from `openenv-core`;
+the API is moving fast). Python 3.10 or newer.
 
 ## 2. The environment
 
@@ -148,7 +150,7 @@ OpenEnv environments are FastAPI servers. `openenv serve` is still a placeholder
 (`env_server.py` wraps this for the notebook and the CLI scripts):
 
 ```bash
-uv run python -m access_request_env.server.app --port 8010
+uv run python -m access_request_env.server.app --host 127.0.0.1 --port 8010
 # web UI: http://127.0.0.1:8010/web   OpenAPI: http://127.0.0.1:8010/docs
 ```
 
@@ -347,13 +349,14 @@ instead of a public Space.
 prompt-optimization/
 ├── README.md                          # this tutorial
 ├── prompt_optimization_openenv.ipynb  # notebook version, executed end to end
+├── images/architecture.svg            # architecture diagram
 ├── access_request_env/                # the OpenEnv environment package
 ├── agent.py                           # Token Factory policy: run_episode / run_batch
 ├── optimize.py                        # reflective prompt optimizer
 ├── evaluate.py                        # compare prompts across models on held-out seeds
 ├── env_server.py                      # start/stop the env server locally
 ├── prompts/                           # baseline.md, optimized.md (GLM run), optimized_qwen3-30b-a3b.md
-├── results/                           # optimization_run.json, evaluation.md/json, qwen3-30b-a3b/
+├── results/                           # per-episode summaries behind the README numbers (compact; --full-trajectories keeps tool traces)
 ├── tests/test_environment.py          # deterministic environment tests
 └── pyproject.toml, uv.lock, env.example
 ```

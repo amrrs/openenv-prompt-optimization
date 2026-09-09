@@ -1,4 +1,4 @@
-openenv>=0.4.1
+openenv==0.4.1
 fastapi>=0.115.0
 uvicorn>=0.24.0
 fastmcp>=2.0.0
